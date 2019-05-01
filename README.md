@@ -39,28 +39,24 @@ By defaul `sawi` uses `django.json`, It is a file  that contains configuration v
 ## TODO
 Expected commands
 
-  [] `sawi install drone`
-  [] `sawi install sentry`
-  [] `sawi install harbor`
-  [] `sawi install sonar`
-  [] `sawi install taiga`
-  [] `sawi install metabase`
+  - [ ] `sawi install drone`
+  - [ ] `sawi install sentry`
+  - [ ] `sawi install harbor` https://github.com/goharbor/harbor
+  - [ ] `sawi install sonar`
+  - [ ] `sawi install taiga`
+  - [ ] `sawi install metabase` https://www.metabase.com/
+  - [ ] `sawi install passbolt` https://passbolt.com/
+  - [ ] `sawi install kuttit` https://github.com/thedevs-network/kutt
+  - [ ] `sawi install documize` https://github.com/documize/community
 
 
 NTH
-https://github.com/goharbor/harbor
+
 https://redash.io/
-https://www.metabase.com/
-https://passbolt.com/
-https://github.com/documize/community
 https://min.io/download#/linux
-https://github.com/thedevs-network/kutt
 https://github.com/outline/outline.  DOCUMENTATION
 
 
-## Extra Config
-For proxy config options check [dockerflow-proxy](http://proxy.dockerflow.com)
-For letsencrypt config options check [dockerflow-le](https://github.com/n1b0r/docker-flow-proxy-letsencrypt)
 
 License
 -------
