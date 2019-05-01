@@ -1,0 +1,17 @@
+*.sw[a-z]
+*.py[cox]
+
+.coverage
+
+.cache/
+.tox/
+.idea/
+
+htmlcov/
+*.egg-info/
+env/
+venv/
+__pycache__
+swarm.json
+django.json
+keys/
