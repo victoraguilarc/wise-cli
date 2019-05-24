@@ -182,13 +182,13 @@ class Pipeline:
                                  " Are you agree? Y/n: ") or "n"
                 if is_agree.upper() == "Y":
                     update_config_file(key="https", value=True)
-                    
+
             if artifact == "renew":
                 Server.renew_ssl(connection, config)
-                
+
             elif artifact == WebServer.NGINX.value:
                 Server.nginx(connection, config)
-                
+
             else:
                 click.echo(click.style(f'[{artifact}] doesn\'t implemented', fg='red'))
         else:
@@ -212,13 +212,18 @@ class Pipeline:
     def server_language(connection, config):
         if connection.run("echo $LANG").ok:
             connection.sudo("echo \"LANG=C.UTF-8\" >> /etc/environment")
-            
+
         if connection.run("echo $LC_CTYPE").ok:
             connection.sudo("echo \"LC_CTYPE=C.UTF-8\" >> /etc/environment")
 
-        if connection.run("echo $LC_ALL").ok:     
+        if connection.run("echo $LC_ALL").ok:
             connection.sudo("echo \"LC_ALL=C.UTF-8\" >> /etc/environment")
-    
+
+    @staticmethod
+    @settings(allow_sudo=True)
+    def reset_db(connection, config):
+        Server.reset_db(connection, config)
+
     # @classmethod
     # def make_backup(cls):
     #     Global.set_user(superuser=True)

@@ -42,8 +42,9 @@ Expected commands
   - [ ] `sawi install drone`
   - [ ] `sawi install sentry`
   - [ ] `sawi install harbor` https://github.com/goharbor/harbor
-  - [ ] `sawi install sonar`
   - [ ] `sawi install taiga`
+  - [ ] `sawi install gogs`
+  - [ ] `sawi install sonar`
   - [ ] `sawi install metabase` https://www.metabase.com/
   - [ ] `sawi install passbolt` https://passbolt.com/
   - [ ] `sawi install kuttit` https://github.com/thedevs-network/kutt

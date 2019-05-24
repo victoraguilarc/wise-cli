@@ -470,9 +470,9 @@ class Server:
     def drop_db(connection, config):
         if config.db_engine == Database.POSTGRESQL.value:
             connection.sudo(f'psql -c "DROP DATABASE {config.project_name};"',
-                            user='postgres', warn=True, hide='both')
+                            user='postgres', warn=True)
             connection.sudo(f'psql -c "DROP ROLE IF EXISTS {config.project_user};"',
-                            user='postgres', warn=True, hide='both')
+                            user='postgres', warn=True)
         elif config.db_engine == Database.MYSQL.value:
             # mysql_user = get_value(env.stage, "mysql_user")
             # mysql_pass = get_value(env.stage, "mysql_pass")

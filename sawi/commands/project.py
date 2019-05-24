@@ -38,8 +38,10 @@ class Project:
 
         click.echo(click.style('-> Configuring virtualenv', fg='cyan'))
 
-        connection.run(f"virtualenv -p python3 {venv_path} --always-copy --no-site-packages")
-        # TODO delete virtualenv folder when this command fails
+        # TODO Check if folder exist, skip this step if this folder exists
+        # TODO if an error occurrs recreate the folder
+        connection.run(f"virtualenv -p python3 {venv_path} --always-copy --no-site-packages", warn=True, hide='both')
+
 
         with connection.cd(code_path):
 

@@ -55,6 +55,10 @@ def upload_key():
 def create_superuser():
     Pipeline.createsuperuser()
 
+@main.command()
+def resetdb():
+    Pipeline.reset_db()
+
 
 @main.command()
 @click.argument('artifact')
