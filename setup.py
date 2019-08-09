@@ -35,7 +35,7 @@ setup(
     name="sawi",
     version='0.0.10',
     description="CLI for Django deployments",
-    long_description="\n\n".join([open("README.md").read()]),
+    long_description="\n\n".join([open("README.rst").read()]),
     license='MIT',
     author="Victor Aguilar C.",
     author_email="victor@xiberty.com",
