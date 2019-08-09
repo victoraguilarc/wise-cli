@@ -3,11 +3,11 @@ Sawi is a tool to deploy `Django` projects based on sawi template at https://git
 Installation
 ------------
 
-**Stable Version**
+**Stable Version**::
 
 `pip install sawi`
 
-**Development Version**
+**Development Version**::
 
 `[sudo] pip install git+https://github.com/vicobits/sawi-cli.git`
 
