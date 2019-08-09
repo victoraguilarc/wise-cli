@@ -124,7 +124,7 @@ class Project:
                 pattern=r'.*password:',
                 response=f'{config.password}\n',
             )
-            run(f"ssh-copy-id {config.project_user}@{config.domain}", pty=True, watchers=[project_password])
+            run(f"ssh-copy-id {config.project_user}@{config.ipv4}", pty=True, watchers=[project_password])
         except Exception as e:
             raise Exception('Unfulfilled local requirements')
 

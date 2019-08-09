@@ -34,7 +34,7 @@ class PyTest(TestCommand):
 setup(
     name="sawi",
     version='0.0.10',
-    description="CLI tools dor docker sawi deployment",
+    description="CLI for Django deployments",
     long_description="\n\n".join([open("README.md").read()]),
     license='MIT',
     author="Victor Aguilar C.",
