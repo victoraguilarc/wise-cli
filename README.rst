@@ -17,7 +17,7 @@ Usage
 
 - Clone sawi Django template::
 
-git clone https://github.com/vicobits/sawi.git
+    git clone https://github.com/vicobits/sawi.git
 
 - Add environment variables
 
