@@ -4,9 +4,11 @@ Installation
 ------------
 
 **Stable Version**
+
 `pip install sawi`
 
 **Development Version**
+
 `[sudo] pip install git+https://github.com/vicobits/sawi-cli.git`
 
 
