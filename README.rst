@@ -3,28 +3,30 @@ Sawi is a tool to deploy `Django` projects based on sawi template at https://git
 Installation
 ------------
 
-**Stable Version**
-`pip install sawi`
+**Stable Version**::
 
-**Development Version**
-`[sudo] pip install git+https://github.com/vicobits/sawi-cli.git`
+    pip install sawi
+
+**Development Version**::
+
+    [sudo] pip install git+https://github.com/vicobits/sawi-cli.git
 
 
 Usage
 -----
 
-1) Clone sawi Django template
+- Clone sawi Django template::
 
-`git clone https://github.com/vicobits/sawi.git`
+    git clone https://github.com/vicobits/sawi.git
 
-2) Add environment variables
+- Add environment variables
 
 The project must have a folder called `.envs` for environment variables por development
 and a file `.env` for production with virtualenv deployment mode.
 
-3) Add config file
+- Add config file
 
-By defaul `sawi` uses `django.json`, This file could contains configuration values, for example::
+By defaul *sawi* uses *django.json*, This file could contains configuration values, for example::
 
     {
         "deployment": "virtualenv",
