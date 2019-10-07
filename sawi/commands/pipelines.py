@@ -53,7 +53,7 @@ def settings(allow_sudo=False, only_local=False):
                         "port": config.port
                     }
                     if allow_sudo:
-                        sudo_pass = getpass(f"Put your [SUDO] password for User [{config.superuser}]: ")
+                        sudo_pass = getpass("Put your [SUDO] password for User [%s]: " % config.superuser)
                         connection_config["user"] = config.superuser
                         connection_config["config"] = Config(
                             overrides={'sudo': {'password': sudo_pass}})

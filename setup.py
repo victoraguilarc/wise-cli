@@ -33,7 +33,7 @@ class PyTest(TestCommand):
 
 setup(
     name="sawi",
-    version='0.0.10',
+    version='0.0.11',
     description="CLI for Django deployments",
     long_description="\n\n".join([open("README.rst").read()]),
     license='MIT',
