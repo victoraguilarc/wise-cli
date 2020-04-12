@@ -21,9 +21,11 @@ class Project:
 
     @staticmethod
     def get_python(config):
-        return ('DJANGO_READ_ENV_FILE=True '
-                'DJANGO_SETTINGS_MODULE=config.settings.production '
-                '{0}/env/bin/python'.format(config.project_path))
+        return (
+            'DJANGO_READ_ENV_FILE=True '
+            'DJANGO_SETTINGS_MODULE=config.settings.production '
+            '{0}/env/bin/python'.format(config.project_path)
+        )
 
     @staticmethod
     def install(connection, config):
@@ -54,15 +56,17 @@ class Project:
             connection.run('{0} manage.py migrate'.format(python))
 
             click.echo(click.style('-> Collecting static files', fg='cyan'))
-            connection.run('{0} manage.py collectstatic -v 0 '
-                           '--noinput '
-                           '--traceback '
-                           '-i django_extensions '
-                           '-i \'*.coffee\' '
-                           '-i \'*.rb\' '
-                           '-i \'*.scss\' '
-                           '-i \'*.less\' '
-                           '-i \'*.sass\' '.format(python))
+            connection.run(
+                '{0} manage.py collectstatic -v 0 '
+                '--noinput '
+                '--traceback '
+                '-i django_extensions '
+                '-i \'*.coffee\' '
+                '-i \'*.rb\' '
+                '-i \'*.scss\' '
+                '-i \'*.less\' '
+                '-i \'*.sass\' '.format(python)
+            )
 
     @staticmethod
     def migrate(connection, config):

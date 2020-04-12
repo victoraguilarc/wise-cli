@@ -46,18 +46,19 @@ def settings(allow_sudo=False, only_local=False):
         @wraps(func)
         def wrapped_function(*args, **kwargs):
             with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
+                warnings.simplefilter('ignore')
                 with Global.settings() as config:
                     key_filename = config.sshkey
                     connection_config = {
-                        "host": config.ipv4,
-                        "port": config.port
+                        'host': config.ipv4,
+                        'port': config.port
                     }
                     if allow_sudo:
                         sudo_pass = getpass('Put your [SUDO] password for User [{0}]: '.format(config.superuser))
                         connection_config['user'] = config.superuser
                         connection_config['config'] = Config(
-                            overrides={'sudo': {'password': sudo_pass}})
+                            overrides={'sudo': {'password': sudo_pass}}
+                        )
                     else:
                         connection_config['user'] = config.project_user
 
@@ -183,12 +184,14 @@ class Pipeline:
         if artifact:
 
             if not config.https:
-                is_agree = input('We will change the value of [https] in your config file,'
-                                 ' Are you agree? Y/n: ') or 'n'
+                is_agree = input(
+                    'We will change the value of [https] in your config file, Are you agree? Y/n: '
+                ) or 'n'
+
                 if is_agree.upper() == "Y":
                     update_config_file(key="https", value=True)
 
-            if artifact == "renew":
+            if artifact == 'renew':
                 Server.renew_ssl(connection, config)
 
             elif artifact == WebServer.NGINX.value:
@@ -204,13 +207,13 @@ class Pipeline:
     @settings(allow_sudo=True)
     def server_language(connection, config):
         if connection.run('echo $LANG').ok:
-            connection.sudo('echo \"LANG=C.UTF-8\" >> /etc/environment')
+            connection.sudo('echo "LANG=C.UTF-8" >> /etc/environment')
 
         if connection.run('echo $LC_CTYPE').ok:
-            connection.sudo('echo \"LC_CTYPE=C.UTF-8\" >> /etc/environment')
+            connection.sudo('echo "LC_CTYPE=C.UTF-8" >> /etc/environment')
 
         if connection.run('echo $LC_ALL').ok:
-            connection.sudo('echo \"LC_ALL=C.UTF-8\" >> /etc/environment')
+            connection.sudo('echo "LC_ALL=C.UTF-8" >> /etc/environment')
 
     @staticmethod
     @settings(allow_sudo=True)

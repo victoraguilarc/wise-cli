@@ -33,14 +33,14 @@ class PyTest(TestCommand):
 
 
 setup(
-    name="wise",
+    name="wise-cli",
     version='0.0.1',
-    description="Django deployment CLI",
+    description="Django deployments CLI",
     long_description="\n\n".join([open("README.rst").read()]),
     license='MIT',
     author="Victor Aguilar C.",
     author_email="victor@xiberty.com",
-    url="https://wise.readthedocs.org",
+    url="https://wise-cli.readthedocs.org",
     packages=find_packages(),
     include_package_data=True,
     install_requires=requires,
