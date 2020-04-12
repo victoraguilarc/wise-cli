@@ -4,11 +4,11 @@ Wise CLI
 `wise` is a tool to deploy `Django` projects based on [django-wise template](https://github.com/victoraguilarc/django-wise)
 
 Installation
-------------
+============
 
 **Stable Version**::
 
-    pip install wise
+    pip install wise-cli
 
 **Development Version**::
 
@@ -16,7 +16,7 @@ Installation
 
 
 Usage
------
+=====
 
 - Clone wise Django template::
     git clone https://github.com/victoraguilarc/wise.git
@@ -39,6 +39,14 @@ By defaul *wise* uses *django.json*, This file could contains configuration valu
         "superuser": "username",
         "sshkey": "/Users/username/.ssh/id_rsa.pub"
     }
+
+
+Development
+===========
+::
+
+    pip install -e .
+
 
 
 License
