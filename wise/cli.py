@@ -2,7 +2,7 @@
 
 import click
 
-from sawi.commands.pipelines import Pipeline
+from wise.commands.pipelines import Pipeline
 
 
 @click.group(chain=True)

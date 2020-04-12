@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
-import sys
 
 import os
+import sys
+
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
 
 requires = [
-    'click==7.0',
-    'requests==2.21.0',
-    'fabric==2.4.0',
-    'Jinja2==2.10.1',
+    'fabric==2.5.0',
+    'click==7.1.1',
+    'requests==2.23.0',
+    'Jinja2==2.11.1',
 ]
 tests_require = ['pytest', 'pytest-cache', 'pytest-cov']
 
@@ -32,19 +33,19 @@ class PyTest(TestCommand):
 
 
 setup(
-    name="sawi",
-    version='0.0.11',
-    description="CLI for Django deployments",
+    name="wise",
+    version='0.0.1',
+    description="Django deployment CLI",
     long_description="\n\n".join([open("README.rst").read()]),
     license='MIT',
     author="Victor Aguilar C.",
     author_email="victor@xiberty.com",
-    url="https://sawi.readthedocs.org",
+    url="https://wise.readthedocs.org",
     packages=find_packages(),
     include_package_data=True,
     install_requires=requires,
     entry_points={'console_scripts': [
-        'sawi = sawi.cli:main']},
+        'wise = wise.cli:main']},
     classifiers=[
         'Development Status :: 1 - Planning',
         'License :: OSI Approved :: MIT License',

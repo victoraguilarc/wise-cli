@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+# -*- coding: utf-8 -*-
 
 import os
 
@@ -7,32 +7,32 @@ from invoke import run, Responder
 
 
 class Project:
-    python = "DJANGO_SETTINGS_MODULE=config.settings.production ./env/bin/python"
-    pip = "./env/bin/pip"
+    python = 'DJANGO_SETTINGS_MODULE=config.settings.production ./env/bin/python'
+    pip = './env/bin/pip'
 
     @staticmethod
     def config_settings(connection, config):
         pass
 
     @staticmethod
-    def push(connection, config, origin="production"):
+    def push(connection, config, origin='production'):
         """ Push changes to selected server"""
-        run(f"git push {origin} master")
+        run('git push {0} master'.format(origin))
 
     @staticmethod
     def get_python(config):
-        return (f"DJANGO_READ_ENV_FILE=True "
-                f"DJANGO_SETTINGS_MODULE=config.settings.production "
-                f"{config.project_path}/env/bin/python")
+        return ('DJANGO_READ_ENV_FILE=True '
+                'DJANGO_SETTINGS_MODULE=config.settings.production '
+                '{0}/env/bin/python'.format(config.project_path))
 
     @staticmethod
     def install(connection, config):
         """
         Run intall command.
         """
-        code_path = f"{config.project_path}/code/"
-        venv_path = f"{config.project_path}/env/"
-        pip = f"{config.project_path}/env/bin/pip"
+        code_path = '{0}/code/'.format(config.project_path)
+        venv_path = '{0}/env/'.format(config.project_path)
+        pip = '{0}/env/bin/pip'.format(config.project_path)
 
         python = Project.get_python(config)
 
@@ -40,35 +40,37 @@ class Project:
 
         # TODO Check if folder exist, skip this step if this folder exists
         # TODO if an error occurrs recreate the folder
-        connection.run(f"virtualenv -p python3 {venv_path} --always-copy --no-site-packages", warn=True, hide='both')
-
+        connection.run(
+            'virtualenv -p python3 {0} --always-copy --no-site-packages'.format(venv_path),
+            warn=True, hide='both'
+        )
 
         with connection.cd(code_path):
 
             click.echo(click.style('-> Installing production requirements ', fg='cyan'))
-            connection.run(f"{pip} install -r requirements/production.txt")
+            connection.run('{0} install -r requirements/production.txt'.format(pip))
 
             click.echo(click.style('-> Loading migrations', fg='cyan'))
-            connection.run(f"{python} manage.py migrate")
+            connection.run('{0} manage.py migrate'.format(python))
 
             click.echo(click.style('-> Collecting static files', fg='cyan'))
-            connection.run(f"{python} manage.py collectstatic -v 0 "
-                           f"--noinput "
-                           f"--traceback "
-                           f"-i django_extensions "
-                           f"-i '*.coffee' "
-                           f"-i '*.rb' "
-                           f"-i '*.scss' "
-                           f"-i '*.less' "
-                           f"-i '*.sass'")
+            connection.run('{0} manage.py collectstatic -v 0 '
+                           '--noinput '
+                           '--traceback '
+                           '-i django_extensions '
+                           '-i \'*.coffee\' '
+                           '-i \'*.rb\' '
+                           '-i \'*.scss\' '
+                           '-i \'*.less\' '
+                           '-i \'*.sass\' '.format(python))
 
     @staticmethod
     def migrate(connection, config):
-        Project.run_command(connection, config, command="migrate")
+        Project.run_command(connection, config, command='migrate')
 
     @staticmethod
     def load_fixtures(connection, config):
-        Project.run_command(connection, config, command="loaddata")
+        Project.run_command(connection, config, command='loaddata')
 
     @staticmethod
     def clean(connection, config):
@@ -80,51 +82,51 @@ class Project:
     @staticmethod
     def environment(connection, config):
         """ Push the environment configuration """
-        if os.path.isfile(".env"):
+        if os.path.isfile('.env'):
             click.echo(click.style('-> Loading [.env] file', fg='cyan'))
-            dest_env = f"{config.project_path}/code/.env"
+            dest_env = '{0}/code/.env'.format(config.project_path)
             connection.put(
-                local=".env",
-                remote=f"{dest_env}",
+                local='.env',
+                remote=dest_env,
             )
         else:
             click.echo(click.style('-> [.env] file is required', fg='red'))
 
     @staticmethod
     def start(connection, config):
-        connection.sudo(f"supervisorctl start {config.project_name}")
+        connection.sudo('supervisorctl start {0}'.format(config.project_name))
 
     @staticmethod
     def restart(connection, config):
-        connection.sudo(f"supervisorctl restart {config.project_name}")
+        connection.sudo('supervisorctl restart {0}'.format(config.project_name))
 
     @staticmethod
     def stop(connection, config):
-        connection.sudo(f"supervisorctl stop {config.project_name}")
+        connection.sudo('supervisorctl stop {0}'.format(config.project_name))
 
     @staticmethod
     def run_command(connection, config, command):
-        code_path = f"{config.project_path}/code/"
-        manage_py = f"{code_path}manage.py"
+        code_path = '{0}/code/'.format(config.project_path)
+        manage_py = '{0}manage.py'.format(code_path)
         python = Project.get_python(config)
 
-        click.echo(click.style(f'-> Running {command}', fg='cyan'))
+        click.echo(click.style('-> Running {0}'.format(command), fg='cyan'))
 
         with connection.cd(code_path):
             connection.run(f"{python} {manage_py} {command}", pty=True)
 
     @staticmethod
     def create_superuser(connection, config):
-        Project.run_command(connection, config, command="createsuperuser")
+        Project.run_command(connection, config, command='createsuperuser')
 
     @staticmethod
     def upload_key(connection, config):
         try:
             project_password = Responder(
                 pattern=r'.*password:',
-                response=f'{config.password}\n',
+                response='{0}\n'.format(config.password),
             )
-            run(f"ssh-copy-id {config.project_user}@{config.ipv4}", pty=True, watchers=[project_password])
+            run('ssh-copy-id {0}@{1}'.format(config.project_user, config.ipv4), pty=True, watchers=[project_password])
         except Exception as e:
             raise Exception('Unfulfilled local requirements')
 

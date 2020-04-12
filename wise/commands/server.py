@@ -1,12 +1,12 @@
-from __future__ import unicode_literals
+# -*- coding: utf-8 -*-
 
 import click
 from invoke import Responder, run
 from pkg_resources import Requirement as req
 from pkg_resources import resource_filename as src
 
-from sawi.commands.config import Database, WebServer, Deployment, Template
-from sawi.commands.config import Global
+from wise.commands.config import Database, WebServer, Deployment, Template
+from wise.commands.config import Global
 
 
 class Server:
@@ -18,16 +18,16 @@ class Server:
         """
         click.echo(click.style('\nInstalling [PROJECT] dependencies...\n', fg='green'))
 
-        result = connection.run("lsb_release -sc", hide=True)
+        result = connection.run('lsb_release -sc', hide=True)
         distro = result.stdout.strip()
 
-        deps_file = src(req.parse("sawi"), f"sawi/templates/system-{distro}.txt")
-        result = connection.local(f"grep -vE '^\s*\#' {deps_file}  | tr '\n' ' '", hide=True)
+        deps_file = src(req.parse('wise'), 'wise/templates/system-{0}.txt'.format(distro))
+        result = connection.local("grep -vE '^\s*\#' {0}  | tr '\n' ' '".format(deps_file), hide=True) # noqa
         pkgs = result.stdout.strip()
 
-        connection.sudo("apt-get install -y %s" % pkgs)
-        connection.sudo("apt-get install -y python-virtualenv python-pip")
-        connection.sudo("apt-get autoremove -y")
+        connection.sudo('apt-get install -y %s' % pkgs)
+        connection.sudo('apt-get install -y python-virtualenv python-pip')
+        connection.sudo('apt-get autoremove -y')
 
         click.echo(click.style('\nInstalling [DATABASES] dependencies...\n', fg='green'))
 
@@ -43,44 +43,46 @@ class Server:
             connection.sudo('apt-get install -y apache2')
 
         if config.https:
-            connection.sudo("apt-get install -y software-properties-common")
-            connection.sudo("add-apt-repository -y ppa:certbot/certbot")
+            connection.sudo('apt-get install -y software-properties-common')
+            connection.sudo('add-apt-repository -y ppa:certbot/certbot')
             connection.sudo('apt-get update')
             connection.sudo('apt-get install -y certbot')
 
-        connection.sudo(f'adduser {config.superuser} {config.project_group}',
-                        warn=True, hide='both')
+        connection.sudo(
+            'adduser {0} {1}'.format(config.superuser, config.project_group),
+            warn=True, hide='both'
+        )
 
     @staticmethod
     def layout(connection, config):
         click.echo(click.style('\n>> Configuring project layout...', fg='green'))
-        connection.sudo(f'mkdir -p '
-                        f'{config.project_path} '
-                        f'{config.project_path}/code/ '
-                        f'{config.project_path}/repo/ '
-                        f'{config.project_path}/etc/ '
-                        f'{config.project_path}/etc/nginx/ '
-                        f'{config.project_path}/etc/ssl/ '
-                        f'{config.project_path}/log/ '
-                        f'{config.project_path}/bin/ '
-                        f'{config.project_path}/htdocs/ '
-                        f'{config.project_path}/htdocs/media/ '
-                        f'{config.project_path}/htdocs/static/',
+        connection.sudo('mkdir -p '
+                        '{project_path} '
+                        '{project_path}/code/ '
+                        '{project_path}/repo/ '
+                        '{project_path}/etc/ '
+                        '{project_path}/etc/nginx/ '
+                        '{project_path}/etc/ssl/ '
+                        '{project_path}/log/ '
+                        '{project_path}/bin/ '
+                        '{project_path}/htdocs/ '
+                        '{project_path}/htdocs/media/ '
+                        '{project_path}/htdocs/static/'.format(project_path=config.project_path),
                         hide='both')
 
         if config.deployment == Deployment.DOCKER.value:
-            connection.sudo(f'mkdir -p {config.project_path}/volumes/', hide='both')
+            connection.sudo('mkdir -p {0}/volumes/'.format(config.project_path), hide='both')
 
-        connection.sudo(f'chown -R {config.project_user}:{config.project_group} {config.project_path}',
+        connection.sudo('chown -R {0}:{1} {2}'.format(config.project_user, config.project_group, config.project_path),
                         hide='both')
         click.echo(click.style('-> Layout configured', fg='cyan'))
 
     @staticmethod
     def certbot(connection, config):
-        cmd = connection.sudo("certbot --help", warn=True, hide='both')
+        cmd = connection.sudo('certbot --help', warn=True, hide='both')
         if cmd.failed:
-            connection.sudo("add-apt-repository ppa:certbot/certbot -yu")
-            connection.sudo("apt install python-certbot-nginx")
+            connection.sudo('add-apt-repository ppa:certbot/certbot -yu')
+            connection.sudo('apt install python-certbot-nginx')
             click.echo(click.style('-> Certbot installed!', fg='cyan'))
 
     @staticmethod
@@ -92,37 +94,42 @@ class Server:
 
         if config.https:
             click.echo(click.style('-> Generating SSL certificate', fg='cyan'))
-            connection.sudo(f"certbot certonly \
-                            --standalone \
-                            --agree-tos \
-                            --email {config.email} \
-                            --domains \"{config.domain}\" \
-                            --pre-hook \"service {config.web_server} stop\" \
-                            --post-hook \"service {config.web_server} start\"")
-
-            connection.sudo(f"chmod -R go-rwx /etc/letsencrypt/live/{config.domain}")
+            connection.sudo(
+                'certbot certonly \
+                --standalone \
+                --agree-tos \
+                --email {email} \
+                --domains "{domain}" \
+                --pre-hook "service {web_server} stop" \
+                --post-hook "service {web_server} start"'.format(
+                    email=config.email,
+                    domain=config.domain,
+                    web_server=config.web_server,
+                )
+            )
+            connection.sudo('chmod -R go-rwx /etc/letsencrypt/live/{0}'.format(config.domain))
 
             # (crontab -l ; echo "0 * * * * your_command") | sort - | uniq - | crontab -
 
-            letsencrypt_folder = "/opt/letsencrypt"
-            letsencrypt_renew = f"{letsencrypt_folder}/renew.sh"
-            letsencrypt_crontab = f"{letsencrypt_folder}/crontab.sh"
+            letsencrypt_folder = '/opt/letsencrypt'
+            letsencrypt_renew = '{0}/renew.sh'.format(letsencrypt_folder)
+            letsencrypt_crontab = '{0}/crontab.sh'.format(letsencrypt_folder)
 
             connection.sudo(f"mkdir -p {letsencrypt_folder}")
 
             click.echo(click.style('-> Adding crontab task', fg='cyan'))
 
-            (Template(name='renew_le.sh', context={"web_server": config.web_server})
+            (Template(name='renew_le.sh', context={'web_server': config.web_server})
              .upload(connection, remote=f"{letsencrypt_renew}"))
 
-            (Template(name='crontab_le.sh', context={"le_path": letsencrypt_folder})
-             .upload(connection, remote=f"{letsencrypt_crontab}"))
+            (Template(name='crontab_le.sh', context={'le_path': letsencrypt_folder})
+             .upload(connection, remote=letsencrypt_crontab))
 
-            connection.sudo(f"chmod +x {letsencrypt_renew}")
-            connection.sudo(f"chmod +x {letsencrypt_crontab}")
+            connection.sudo('chmod +x {0}'.format(letsencrypt_renew))
+            connection.sudo('chmod +x {0}'.format(letsencrypt_crontab))
             connection.sudo(letsencrypt_crontab)
-            connection.sudo(f"rm {letsencrypt_crontab}")
-            connection.sudo("service cron restart")
+            connection.sudo('rm {0}'.format(letsencrypt_crontab))
+            connection.sudo('service cron restart')
 
             click.echo(click.style('-> Let\'s Encrypt configured', fg='cyan'))
         else:
@@ -130,8 +137,10 @@ class Server:
 
     @staticmethod
     def renew_ssl(connection, config):
-        connection.sudo(f'certbot renew --pre-hook "service {config.web_server} stop" '
-                        f'--post-hook "service {config.web_server} start"')
+        connection.sudo(
+            'certbot renew --pre-hook "service {web_server} stop" '
+            '--post-hook "service {web_server} start"'.format(web_server=config.web_server)
+        )
 
     @staticmethod
     def reboot(connection, config):
@@ -148,18 +157,20 @@ class Server:
          Create project User.
         """
         click.echo(click.style('\n>> Creating Project User ...', fg='green'))
-        user_exists = connection.run(f"id -u {config.project_user}", warn=True, hide='both')
+        user_exists = connection.run('id -u {0}'.format(config.project_user), warn=True, hide='both')
         if not user_exists.ok:
-            connection.sudo(f'adduser {config.project_user} '
-                            f'--disabled-password --gecos \"\"', hide=True)
+            connection.sudo(
+                'adduser {0} --disabled-password --gecos \"\"'.format(config.project_user),
+                hide=True
+            )
 
-            new_password = Responder(r"New password:", f"{config.password}\n")
-            retype_new_password = Responder(r'Retype new password:', f"{config.password}\n")
-            connection.sudo(f'passwd {config.project_user}', pty=True,
+            new_password = Responder('New password:', '{0}\n'.format(config.password))
+            retype_new_password = Responder(r'Retype new password:', '{0}\n'.format(config.password))
+            connection.sudo('passwd {0}'.format(config.project_user), pty=True,
                             watchers=[new_password, retype_new_password], hide='out')
         else:
             click.echo(click.style('User alredy exists..', fg='cyan'))
-        connection.sudo(f'mkdir -p {Global.HOME_BASE_PATH}', hide='both')
+        connection.sudo('mkdir -p {0}'.format(Global.HOME_BASE_PATH), hide='both')
 
     @staticmethod
     def group(connection, config):
@@ -167,13 +178,12 @@ class Server:
          Create project Group.
         """
         click.echo(click.style('\n>> Configuring project group...', fg='green'))
-        connection.sudo(f'groupadd --system {config.project_group}', warn=True)
-        connection.sudo(f'useradd '
-                        f'--system '
-                        f'--gid {config.project_group} '
-                        f'--shell /bin/bash '
-                        f'--home {config.project_path} {config.project_user}',
-                        warn=True, hide='out')
+        connection.sudo('groupadd --system {0}'.format(config.project_group), warn=True)
+        connection.sudo(
+            'useradd --system --gid {0} --shell /bin/bash --home {1} {2}'.format(
+                config.project_group, config.project_path, config.project_user
+            ), warn=True, hide='out'
+        )
 
     @staticmethod
     def create_db(connection, config):
@@ -191,14 +201,16 @@ class Server:
         1. Create DB user.
         2. Create DB and assign to user.
         """
-        result_db = connection.sudo(f'psql -c "CREATE DATABASE {config.project_name};"',
+        result_db = connection.sudo('psql -c "CREATE DATABASE {0};"'.format(config.project_name),
                                     warn=True, hide='err', user='postgres')
         if not result_db.ok:
             click.echo(click.style('-> DB alredy exists', fg='cyan'))
 
-        result_user = connection.sudo(f'psql -c "CREATE USER {config.project_name} '
-                                      f'WITH ENCRYPTED PASSWORD \'{config.password}\';"',
-                                      warn=True, hide='err', user='postgres')
+        result_user = connection.sudo(
+            'psql -c "CREATE USER {0} WITH ENCRYPTED PASSWORD \'{1}\';"'.format(
+                config.project_name, config.password
+            ), warn=True, hide='err', user='postgres'
+        )
         if not result_user.ok:
             click.echo(click.style('-> DB User alredy exists', fg='cyan'))
 
@@ -256,7 +268,7 @@ class Server:
 
     @staticmethod
     def git_repo_path(config):
-        return f"{config.project_path}/repo/{config.project_name}.git"
+        return '{0}/repo/{1}.git'.format(config.project_path, config.project_name)
 
     @staticmethod
     def git(connection, config):
@@ -267,22 +279,25 @@ class Server:
         click.echo(click.style('\n>> Configuring project repository...', fg='green'))
         repo_git_path = Server.git_repo_path(config)
 
-        connection.sudo(f'mkdir -p {repo_git_path}',
+        connection.sudo('mkdir -p {0}'.format(repo_git_path),
                         user=config.project_user)
 
-        connection.sudo(f'git init --bare --shared {repo_git_path}',
+        connection.sudo('git init --bare --shared {0}'.format(repo_git_path),
                         user=config.project_user,
                         warn=True)
 
-        work_dir = f"{config.project_path}/code/"
-        post_receive_file = f"{repo_git_path}/hooks/post-receive"
+        work_dir = '{0}/code/'.format(config.project_path)
+        post_receive_file = '{0}/hooks/post-receive'.format(repo_git_path)
 
-        (Template(name='post-receive', context={"work_dir": work_dir})
+        (Template(name='post-receive', context={'work_dir': work_dir})
          .upload(connection, remote=post_receive_file))
 
-        connection.sudo(f'chmod +x {post_receive_file}')
-        connection.sudo(f'chown -R {config.project_user}:{config.project_group} {repo_git_path}',
-                        hide='both')
+        connection.sudo('chmod +x {0}'.format(post_receive_file))
+        connection.sudo(
+            'chown -R {0}:{1} {2}'.format(
+                config.project_user, config.project_group, repo_git_path
+            ), hide='both'
+        )
         click.echo(click.style('-> Git repository configured', fg='cyan'))
 
     @staticmethod
@@ -292,13 +307,12 @@ class Server:
         2. Add existent server remote git value.
         """
         git_repo_path = Server.git_repo_path(config)
-        git_remote_path = f"{config.project_user}@{config.domain}:{git_repo_path}"
+        git_remote_path = '{0}@{1}:{2}'.format(
+            config.project_user, config.domain, git_repo_path
+        )
 
-        run(f'git remote remove {origin}',
-            warn=True, hide='both')
-
-        run(f'git remote add {origin} {git_remote_path}',
-            warn=True, hide='both')
+        run('git remote remove {0}'.format(origin), warn=True, hide='both')
+        run('git remote add {0} {1}'.format(origin, git_remote_path), warn=True, hide='both')
 
         click.echo(click.style('-> Git origin configured', fg='cyan'))
 
@@ -314,35 +328,35 @@ class Server:
 
         connection.sudo('rm /etc/nginx/sites-enabled/default',
                         hide='both', warn=True)
-        connection.sudo(f'rm /etc/nginx/sites-enabled/{config.project_name}.conf',
+        connection.sudo('rm /etc/nginx/sites-enabled/{0}.conf'.format(config.project_name),
                         hide='both', warn=True)
-        connection.sudo(f'rm /etc/nginx/sites-available/{config.project_name}.conf',
+        connection.sudo('rm /etc/nginx/sites-available/{0}.conf'.format(config.project_name),
                         hide='both', warn=True)
 
         context = {
-            "project_name": config.project_name,
-            "project_path": f"{config.project_path}",
-            "project_htdocs": f"{config.project_path}/htdocs/",
-            "project_domain": config.domain
+            'project_name': config.project_name,
+            'project_path': config.project_path,
+            'project_htdocs': '{0}/htdocs/'.format(config.project_path),
+            'project_domain': config.domain
         }
         if config.https:
-            nginx_config = Template(name="django_nginx_ssl.conf",
-                                    context=context)
+            nginx_config = Template(
+                name='django_nginx_ssl.conf', context=context
+            )
         else:
-            nginx_config = Template(name="django_nginx.conf",
-                                    context=context)
+            nginx_config = Template(
+                name='django_nginx.conf', context=context
+            )
 
-        tmp_nginx_conf = f'/tmp/{config.project_name}.conf'
-        dest_nginx_conf = f'/etc/nginx/sites-available/{config.project_name}.conf'
+        tmp_nginx_conf = '/tmp/{0}.conf'.format(config.project_name)
+        dest_nginx_conf = '/etc/nginx/sites-available/{0}.conf'.format(config.project_name)
         connection.put(
             local=nginx_config,
             remote=tmp_nginx_conf,
         )
 
-        connection.sudo(f'mv {tmp_nginx_conf} {dest_nginx_conf}',
-                        warn=True, hide='both')
-        connection.sudo(f'ln -s {dest_nginx_conf} /etc/nginx/sites-enabled/',
-                        warn=True, hide='both')
+        connection.sudo('mv {0} {1}'.format(tmp_nginx_conf, dest_nginx_conf), warn=True, hide='both')
+        connection.sudo('ln -s {0} /etc/nginx/sites-enabled/'.format(dest_nginx_conf), warn=True, hide='both')
 
         click.echo(click.style('-> Nginx configured', fg='cyan'))
 
@@ -364,25 +378,22 @@ class Server:
         """
         click.echo(click.style('\n>> Configuring gunicorn settings', fg='green'))
 
-        connection.sudo(f'mkdir -p {config.project_path}/bin',
-                        warn=True, hide='both')
-        tmp_gunicorn = f'/tmp/start.sh'
-        dest_gunicorn = f'{config.project_path}/bin/start.sh'
+        connection.sudo('mkdir -p {0}/bin'.format(config.project_path), warn=True, hide='both')
+        tmp_gunicorn = '/tmp/start.sh'
+        dest_gunicorn = '{0}/bin/start.sh'.format(config.project_path)
         connection.put(
             local=Template(
-                name="start.sh",
+                name='start.sh',
                 context={
-                    "project_name": config.project_name,
-                    "project_path": config.project_path,
-                    "project_code_path": f"{config.project_path}/code/",
-                    "project_user": config.project_user,
-                    "project_group": config.project_group,}),
+                    'project_name': config.project_name,
+                    'project_path': config.project_path,
+                    'project_code_path': '{0}/code/'.format(config.project_path),
+                    'project_user': config.project_user,
+                    'project_group': config.project_group,}),
             remote=tmp_gunicorn
         )
-        connection.sudo(f'mv {tmp_gunicorn} {dest_gunicorn}',
-                        warn=True, hide='both')
-        connection.sudo(f'chmod +x {dest_gunicorn}',
-                        warn=True, hide='both')
+        connection.sudo('mv {0} {1}'.format(tmp_gunicorn, dest_gunicorn), warn=True, hide='both')
+        connection.sudo('chmod +x {0}'.format(dest_gunicorn), warn=True, hide='both')
         click.echo(click.style('-> Gunicorn configured', fg='cyan'))
 
     @staticmethod
@@ -394,14 +405,17 @@ class Server:
         """
         click.echo(click.style('\n>> Configuring Supervisor for project', fg='green'))
 
-        dest_supervisor = f"/etc/supervisor/conf.d/{config.project_name}.conf"
+        dest_supervisor = '/etc/supervisor/conf.d/{0}.conf'.format(config.project_name)
 
-        (Template(name="django_supervisor.conf",
-                  context={"project_name": config.project_name,
-                           "project_path": config.project_path,
-                           "project_user": config.project_user,
-                           "project_group": config.project_group, })
-         .upload(connection, remote=dest_supervisor))
+        (Template(
+            name='django_supervisor.conf',
+            context={
+                'project_name': config.project_name,
+                'project_path': config.project_path,
+                'project_user': config.project_user,
+                'project_group': config.project_group,
+            }
+        ).upload(connection, remote=dest_supervisor))
 
         click.echo(click.style('-> Supervisor configured', fg='cyan'))
 
@@ -417,26 +431,26 @@ class Server:
 
         connection.sudo('service nginx restart')
         connection.sudo('service supervisor restart')
-        connection.sudo(f'supervisorctl restart {config.project_name}')
+        connection.sudo('supervisorctl restart {0}'.format(config.project_name))
 
     @staticmethod
     def configure_locales(connection, config):
         """
         Generate and configure locales in recently installed server.
         """
-        connection.sudo("locale-gen en_US.UTF-8", warn=True, hide='both')
-        connection.sudo("dpkg-reconfigure locales", warn=True, hide='both')
+        connection.sudo('locale-gen en_US.UTF-8', warn=True, hide='both')
+        connection.sudo('dpkg-reconfigure locales', warn=True, hide='both')
 
     @staticmethod
     def fix_permissions(connection, config):
         """
          Fix Permissions.
         """
-        connection.sudo(f'chown -R {config.project_user}:{config.project_group} '
-                        f'{config.project_path}',
-                        warn=True, hide='both')
-        connection.sudo(f'chmod -R g+w {config.project_path}',
-                        warn=True, hide='both')
+        connection.sudo('chown -R {0}:{1} {2}'.format(
+            config.project_user, config.project_group, config.project_path
+        ), warn=True, hide='both')
+
+        connection.sudo('chmod -R g+w {0}'.format(config.project_path), warn=True, hide='both')
 
     @staticmethod
     def clean(connection, config):
@@ -451,28 +465,32 @@ class Server:
         8. Delete app user.
         """
         click.echo(click.style('\n>> Uninstalling project ...', fg='green'))
-        cmd = {"warn": True, "hide": "both"}
-        connection.sudo(f'pkill -u {config.project_user}', **cmd)
+        cmd = {'warn': True, 'hide': 'both'}
+        connection.sudo('pkill -u {0}'.format(config.project_user), **cmd)
         Server.drop_db(connection, config)
 
-        connection.sudo(f'rm -f /etc/supervisor/conf.d/{config.project_name}.conf', **cmd)
-        connection.sudo(f'rm -f /etc/nginx/sites-enabled/{config.project_name}.conf', **cmd)
-        connection.sudo(f'rm -f /etc/nginx/sites-available/{config.project_name}.conf', **cmd)
+        connection.sudo('rm -f /etc/supervisor/conf.d/{0}.conf'.format(config.project_name), **cmd)
+        connection.sudo('rm -f /etc/nginx/sites-enabled/{0}.conf'.format(config.project_name), **cmd)
+        connection.sudo('rm -f /etc/nginx/sites-available/{0}.conf'.format(config.project_name), **cmd)
 
-        connection.sudo(f'rm -rf {config.project_path}/bin/{config.project_name}.socket', **cmd)
-        connection.sudo(f'groupdel {config.project_group}', **cmd)
-        connection.sudo(f'userdel -r {config.project_user}', **cmd)
-        connection.sudo(f'rm -rf {config.project_path}', **cmd)
+        connection.sudo('rm -rf {0}/bin/{1}.socket'.format(config.project_path, config.project_name), **cmd)
+        connection.sudo('groupdel {0}'.format(config.project_group), **cmd)
+        connection.sudo('userdel -r {0}'.format(config.project_user), **cmd)
+        connection.sudo('rm -rf {0}'.format(config.project_path), **cmd)
 
         click.echo(click.style('-> Project uninstalled', fg='cyan'))
 
     @staticmethod
     def drop_db(connection, config):
         if config.db_engine == Database.POSTGRESQL.value:
-            connection.sudo(f'psql -c "DROP DATABASE {config.project_name};"',
-                            user='postgres', warn=True)
-            connection.sudo(f'psql -c "DROP ROLE IF EXISTS {config.project_user};"',
-                            user='postgres', warn=True)
+            connection.sudo(
+                'psql -c "DROP DATABASE {0};"'.format(config.project_name),
+                user='postgres', warn=True,
+            )
+            connection.sudo(
+                'psql -c "DROP ROLE IF EXISTS {0};"'.format(config.project_user),
+                user='postgres', warn=True,
+            )
         elif config.db_engine == Database.MYSQL.value:
             # mysql_user = get_value(env.stage, "mysql_user")
             # mysql_pass = get_value(env.stage, "mysql_pass")

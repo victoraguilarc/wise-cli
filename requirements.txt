@@ -1,10 +1,10 @@
-tox==3.8.6
-pytest==4.4.0
+tox==3.14.6
+pytest==5.4.1
 pytest-cache==1.0
 rstcheck==3.3.1
-ipdb==0.12
+ipdb==0.13.2
 
-fabric==2.4.0
-click==7.0
-requests==2.21.0
-Jinja2==2.10.1
+fabric==2.5.0
+click==7.1.1
+requests==2.23.0
+Jinja2==2.11.1

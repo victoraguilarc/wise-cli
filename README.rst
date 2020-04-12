@@ -1,45 +1,50 @@
-Sawi is a tool to deploy `Django` projects based on sawi template at https://github.com/vicobits/sawi
+Wise CLI
+--------
+
+`wise` is a tool to deploy `Django` projects based on [django-wise template](https://github.com/victoraguilarc/django-wise)
 
 Installation
 ------------
 
 **Stable Version**::
 
-    pip install sawi
+    pip install wise
 
 **Development Version**::
 
-    [sudo] pip install git+https://github.com/vicobits/sawi-cli.git
+    [sudo] pip install git+https://github.com/victoraguilarc/wise-cli.git
 
 
 Usage
 -----
 
-- Clone sawi Django template::
+- Clone wise Django template::
+    git clone https://github.com/victoraguilarc/wise.git
 
-    git clone https://github.com/vicobits/sawi.git
-
-- Add environment variables
+- Add environment variables to cloned project.
 
 The project must have a folder called `.envs` for environment variables por development
 and a file `.env` for production with virtualenv deployment mode.
 
-- Add config file
+- Add config file to cloned project.
 
-By defaul *sawi* uses *django.json*, This file could contains configuration values, for example::
+By defaul *wise* uses *django.json*, This file could contains configuration values, for example::
 
-    {
-        "deployment": "virtualenv",
-        "project": "sawi",
-        "password": "CHANGE_THIS!!",
-        "domain": "www.xiberty.com",
-        "ipv4": "0.0.0.0",
-        "db_engine": "postgres",
-        "web_server": "nginx",
-        "https": true,
-        "superuser": "username",
-        "sshkey": "/Users/username/.ssh/id_rsa.pub"
-    }
+
+```{
+    "deployment": "virtualenv",
+    "project": "wise",
+    "password": "CHANGE_THIS!!",
+    "domain": "www.xiberty.com",
+    "ipv4": "0.0.0.0",
+    "db_engine": "postgres",
+    "web_server": "nginx",
+    "https": true,
+    "superuser": "username",
+    "sshkey": "/Users/username/.ssh/id_rsa.pub"
+}
+```
+
 
 
 
@@ -47,7 +52,7 @@ License
 -------
 This code is licensed under the `MIT License`_.
 
-.. _`MIT License`: https://github.com/vicobits/suarm/blob/master/LICENSE
+.. _`MIT License`: https://github.com/victoraguilarc/suarm/blob/master/LICENSE
 
 
 

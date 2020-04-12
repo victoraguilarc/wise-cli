@@ -1,21 +1,20 @@
-from __future__ import future_fstrings
+# -*- coding: utf-8 -*-
 
 import json
 import sys
-import warnings
-from getpass import getpass
-
 import click
+import warnings
+
 from fabric import Config
+from os.path import isfile
+from functools import wraps
+from getpass import getpass
 from fabric.connection import Connection
 from paramiko import AuthenticationException
 
-from sawi.commands.config import Global, WebServer
-from os.path import isfile
-from functools import wraps
-
-from sawi.commands.project import Project
-from sawi.commands.server import Server
+from wise.commands.project import Project
+from wise.commands.server import Server
+from wise.commands.config import Global, WebServer
 
 
 def logit(logfile='out.log'):
@@ -36,7 +35,7 @@ def update_config_file(key, value):
     with open(Global.CONFIG_FILE_NAME, 'r+') as f:
         data = json.load(f)
         if 'https' in data:
-            data["https"] = True  # <--- add `https` value.
+            data['https'] = True  # <--- add `https` value.
             f.seek(0)  # <--- should reset file position to the beginning.
             json.dump(data, f, indent=4)
             f.truncate()  # remove remaining part
@@ -55,26 +54,30 @@ def settings(allow_sudo=False, only_local=False):
                         "port": config.port
                     }
                     if allow_sudo:
-                        sudo_pass = getpass(f"Put your [SUDO] password for User [{config.superuser}]: ")
-                        connection_config["user"] = config.superuser
-                        connection_config["config"] = Config(
+                        sudo_pass = getpass('Put your [SUDO] password for User [{0}]: '.format(config.superuser))
+                        connection_config['user'] = config.superuser
+                        connection_config['config'] = Config(
                             overrides={'sudo': {'password': sudo_pass}})
                     else:
-                        connection_config["user"] = config.project_user
+                        connection_config['user'] = config.project_user
 
                     if not isfile(key_filename):
-                        sys.exit("[sshkey] file doesn't exists")
-                    connection_config["connect_kwargs"] = {"key_filename": key_filename}
+                        sys.exit('[sshkey] file doesn\'t exists')
+                    connection_config['connect_kwargs'] = {'key_filename': key_filename}
                     connection = Connection(**connection_config)
 
                     try:
                         if not only_local:
-                            connection.run("uname", hide='both', warn=True)
+                            connection.run('uname', hide='both', warn=True)
                         func(connection, config, *args, **kwargs)
                     except AuthenticationException:
-                        click.echo(click.style(f'Your ssh connection isn\'t configured correctly\n'
-                                               f'Set your private ssh_keyfile for [{connection_config["user"]}]',
-                                               fg='red'))
+                        click.echo(
+                            click.style(
+                                'Your ssh connection isn\'t configured correctly\n'
+                                'Set your private ssh_keyfile for [{0}]'.format(connection_config['user']),
+                                fg='red'
+                            )
+                        )
         return wrapped_function
     return settings_decorator
 
@@ -180,8 +183,8 @@ class Pipeline:
         if artifact:
 
             if not config.https:
-                is_agree = input("We will change the value of [https] in your config file,"
-                                 " Are you agree? Y/n: ") or "n"
+                is_agree = input('We will change the value of [https] in your config file,'
+                                 ' Are you agree? Y/n: ') or 'n'
                 if is_agree.upper() == "Y":
                     update_config_file(key="https", value=True)
 
@@ -192,34 +195,22 @@ class Pipeline:
                 Server.nginx(connection, config)
 
             else:
-                click.echo(click.style(f'[{artifact}] doesn\'t implemented', fg='red'))
+                click.echo(click.style('[{0}] doesn\'t implemented'.format(artifact), fg='red'))
         else:
             Server.certbot(connection, config)
             Server.letsencrypt(connection, config)
 
     @staticmethod
     @settings(allow_sudo=True)
-    def test(connection, config):
-        pass
-        # 1. Check nginx config
-        # 2. Check supervidor config
-        # 3. Check project layout
-        # 4. Check project code
-        # 5. Check Database
-        # Server.certbot(connection, config)
-        # Server.letsencrypt(connection, config)
-
-    @staticmethod
-    @settings(allow_sudo=True)
     def server_language(connection, config):
-        if connection.run("echo $LANG").ok:
-            connection.sudo("echo \"LANG=C.UTF-8\" >> /etc/environment")
+        if connection.run('echo $LANG').ok:
+            connection.sudo('echo \"LANG=C.UTF-8\" >> /etc/environment')
 
-        if connection.run("echo $LC_CTYPE").ok:
-            connection.sudo("echo \"LC_CTYPE=C.UTF-8\" >> /etc/environment")
+        if connection.run('echo $LC_CTYPE').ok:
+            connection.sudo('echo \"LC_CTYPE=C.UTF-8\" >> /etc/environment')
 
-        if connection.run("echo $LC_ALL").ok:
-            connection.sudo("echo \"LC_ALL=C.UTF-8\" >> /etc/environment")
+        if connection.run('echo $LC_ALL').ok:
+            connection.sudo('echo \"LC_ALL=C.UTF-8\" >> /etc/environment')
 
     @staticmethod
     @settings(allow_sudo=True)
