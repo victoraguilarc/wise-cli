@@ -11,7 +11,7 @@ requires = [
     'fabric==2.5.0',
     'click==7.1.1',
     'requests==2.23.0',
-    'Jinja2==2.11.1',
+    'Jinja2==2.11.3',
 ]
 tests_require = ['pytest', 'pytest-cache', 'pytest-cov']
 
