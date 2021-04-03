@@ -23,7 +23,8 @@ class Project:
     def get_python(config):
         return (
             'DJANGO_READ_ENV_FILE=True '
-            'DJANGO_SETTINGS_MODULE=config.settings.production '
+            'DJANGO_ENV=production '
+            'DJANGO_SETTINGS_MODULE=config.settings '
             '{0}/env/bin/python'.format(config.project_path)
         )
 

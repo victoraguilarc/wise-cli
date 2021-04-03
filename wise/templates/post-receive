@@ -1,6 +1,2 @@
 #!/bin/sh
 GIT_WORK_TREE={{ work_dir }} git checkout -f
-
-
-avy
-1029384756OEP

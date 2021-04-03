@@ -17,11 +17,15 @@ class Server:
         Install all server dependencies.
         """
         click.echo(click.style('\nInstalling [PROJECT] dependencies...\n', fg='green'))
+        
+
 
         result = connection.run('lsb_release -sc', hide=True)
         distro = result.stdout.strip()
 
-        deps_file = src(req.parse('wise'), 'wise/templates/system-{0}.txt'.format(distro))
+        click.echo(click.style(distro, fg='green'))
+
+        deps_file = src(req.parse('wise-cli'), 'wise/templates/system-{0}.txt'.format(distro))
         result = connection.local("grep -vE '^\s*\#' {0}  | tr '\n' ' '".format(deps_file), hide=True) # noqa
         pkgs = result.stdout.strip()
 
