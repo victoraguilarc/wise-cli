@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "wise-cli"
+version = "0.0.2"
+description = "Django deployments CLI."
+authors = ["Victor Aguilar C. <vicobits@gmail.com>"]
+maintainers = ["Victor Aguilar C. <vicobits@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = ""
+repository = "https://github.com/victoraguilarc/wise-cli/"
+documentation = "https://github.com/victoraguilarc/wise-cli/"
+packages = [
+    { include = "src" },
+    { include = "tests" },
+]
+
+keywords = [
+    "Django",
+    "Deployment",
+    "Poetry",
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fabric = "*"
+click = "8.1.2"
+requests = "^2.27.1"
+Jinja2 = "^3.1.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "*"
+pytest-cache = "*"
+pytest-cov = "*"
+ipdb = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.scripts]
+wise = "src.cli:main"
+
+[tool.poetry.urls]
+issues = "https://github.com/hackersandslackers/python-poetry-tutorial/issues"

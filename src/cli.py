@@ -2,7 +2,7 @@
 
 import click
 
-from wise.commands.pipelines import Pipeline
+from src.commands.pipelines import Pipeline
 
 
 @click.group(chain=True)
@@ -55,6 +55,7 @@ def upload_key():
 def create_superuser():
     Pipeline.createsuperuser()
 
+
 @main.command()
 def resetdb():
     Pipeline.reset_db()
@@ -75,11 +76,6 @@ def restart():
 @click.argument('command')
 def run(command):
     Pipeline.run_command(command=command)
-
-
-@main.command()
-def test():
-    Pipeline.test()
 
 
 @main.command()
