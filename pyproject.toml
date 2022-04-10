@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "wise-cli"
-version = "0.0.2"
+version = "0.0.3"
 description = "Django deployments CLI."
 authors = ["Victor Aguilar C. <vicobits@gmail.com>"]
 maintainers = ["Victor Aguilar C. <vicobits@gmail.com>"]
