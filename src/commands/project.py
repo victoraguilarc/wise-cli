@@ -25,9 +25,7 @@ class Project:
     @staticmethod
     def get_python(config: ProjectConfig):
         return (
-            'DJANGO_READ_ENV_FILE=True '
             'DJANGO_ENV=production '
-            'DJANGO_SETTINGS_MODULE=config.settings '
             '{0}/env/bin/python'.format(config.project_path)
         )
 

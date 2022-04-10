@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "wise-cli"
-version = "0.0.3"
+version = "0.0.4"
 description = "Django deployments CLI."
 authors = ["Victor Aguilar C. <vicobits@gmail.com>"]
 maintainers = ["Victor Aguilar C. <vicobits@gmail.com>"]
@@ -21,7 +21,7 @@ keywords = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.8"
 fabric = "*"
 click = "8.1.2"
 requests = "^2.27.1"
